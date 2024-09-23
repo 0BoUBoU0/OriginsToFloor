@@ -7,7 +7,7 @@ bl_info = {
     "warning": "",
     "category": "Object",
     "blender": (2,90,0),
-    "version": (1,3,22)
+    "version": (1,3,21)
 }
 
 # get addon name and version to use them automaticaly in the addon
