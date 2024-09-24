@@ -7,7 +7,7 @@ bl_info = {
     "warning": "",
     "category": "Object",
     "blender": (2,90,0),
-    "version": (1,3,21)
+    "version": (1,3,3)
 }
 
 # get addon name and version to use them automaticaly in the addon
@@ -23,10 +23,11 @@ debug_mode = False
 separator = "-" * 20
 
 # define menu
-# Define the menu
-def originFloor_menu_draw(self, context):
-    layout = self.layout
-    layout.operator('object.origins_on_the_floor', icon="SORT_ASC")
+def originFloor_menu_draw(self,context):
+    self.layout.operator('object.origins_on_the_floor',icon="SORT_ASC")
+    self.layout.operator('object.origins_on_the_left',icon="SORT_ASC")
+    self.layout.operator('object.origins_on_the_right',icon="SORT_ASC")
+    self.layout.operator('object.origins_on_the_top',icon="SORT_DESC")
 
 def getverticeslist(object,smoothed):
     sel_obj = object
@@ -73,7 +74,7 @@ def getverticeslist(object,smoothed):
     
 
 # create operator UPPER_OT_lower and idname = upper.lower         
-class OBJECT_OT_origins_on_the_floor(bpy.types.Operator):
+class OBJECT_OT_origins_on__the_floor(bpy.types.Operator):
     bl_idname = 'object.origins_on_the_floor'
     bl_label = f"{Addon_Name} - {Addon_Version}"
     bl_description = "Move the origin at the lower part of your selected meshes"
@@ -250,8 +251,8 @@ class OBJECT_OT_origins_on_the_floor(bpy.types.Operator):
 ootf_addon_keymaps = []
 
 def register():
-    bpy.utils.register_class(OBJECT_OT_origins_on_the_floor)
-    bpy.types.VIEW3D_MT_object_origin_set.append(originFloor_menu_draw)
+    bpy.utils.register_class(OBJECT_OT_origins_on__the_floor)
+    bpy.types.VIEW3D_MT_object.append(originFloor_menu_draw)
     # add keymap
     if bpy.context.window_manager.keyconfigs.addon:
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name="Window", space_type="EMPTY")
@@ -263,13 +264,9 @@ def register():
         ootf_addon_keymaps.append((keymap, keymapitem))
 
 def unregister():
-    bpy.utils.unregister_class(OBJECT_OT_origins_on_the_floor)
-    bpy.types.VIEW3D_MT_object_origin_set.remove(originFloor_menu_draw)
+    bpy.utils.unregister_class(OBJECT_OT_origins_on__the_floor)
+    bpy.types.VIEW3D_MT_object.remove(originFloor_menu_draw)
     # remove keymap
     for keymap, keymapitem in ootf_addon_keymaps:
         keymap.keymap_items.remove(keymapitem)
     ootf_addon_keymaps.clear()
-
-# Entry point for the script
-if __name__ == "__main__":
-    register()
