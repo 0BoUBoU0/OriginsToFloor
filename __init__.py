@@ -7,13 +7,13 @@ bl_info = {
     "warning": "",
     "category": "Object",
     "blender": (2,90,0),
-    "version": (1,3,3)
+    "version": (1,3,31)
 }
 
 # get addon name and version to use them automaticaly in the addon
 Addon_Name = str(bl_info["name"])
 Addon_Version = str(bl_info["version"])
-Addon_Version = Addon_Version[1:8].replace(",",".")
+Addon_Version = Addon_Version[1:-1].replace(",",".")
 
 # import modules
 import bpy
@@ -57,8 +57,6 @@ def getverticeslist(object,smoothed):
     obj_origin.select_set(True)    
     bpy.context.view_layer.objects.active = obj_origin
     # if user want centered on x and y
-    #if centered == True:
-    #    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
     # get vertex coordinates list (multiplied by the object matrix to get it in world space)
     vert_coord_list = []
@@ -93,11 +91,6 @@ class OBJECT_OT_origins_on__the_floor(bpy.types.Operator):
             description = "Will get the floor of the soothed version of each selected objects (/!\ slower process /!\)",
             default=False,
     ) 
-    # origins_XY_centered: bpy.props.BoolProperty(
-    #         name = "X and Y axis are centered",
-    #         description = "origins centered in x and y axis, and z on the floor",
-    #         default=True,
-    # )
     origins_options = [("Centered","Centered","Centered",0),("Floor","Floor","Floor",1),("Ceil","Ceil","Ceil",2),("Still","Still","Still",3)]
     origins_axisX_prop : bpy.props.EnumProperty(name = "X axis behavior",description = "How the axis behave",items = origins_options,default=0)
     origins_axisY_prop : bpy.props.EnumProperty(name = "Y axis behavior",description = "How the axis behave",items = origins_options,default=0)
@@ -107,7 +100,13 @@ class OBJECT_OT_origins_on__the_floor(bpy.types.Operator):
     def execute(self, context):
         print(f"\n {separator} Begin {Addon_Name} {separator} \n")
         
+        # store cursor transforms
+        orig_cursor_loc = bpy.context.scene.cursor.location
+        orig_cursor_rot = bpy.context.scene.cursor.rotation_euler
+
+        # on 0 to avoid mistakes
         bpy.context.scene.cursor.location = (0,0,0)
+        bpy.context.scene.cursor.rotation_euler = (0,0,0)
         
         # save selection set
         selected_obj = []
@@ -228,8 +227,12 @@ class OBJECT_OT_origins_on__the_floor(bpy.types.Operator):
         
         
         # reset cursor position
-        bpy.context.scene.cursor.location = (0,0,0)
-        bpy.context.scene.cursor.rotation_euler = (0,0,0)
+        # bpy.context.scene.cursor.location = (0,0,0)
+        # bpy.context.scene.cursor.rotation_euler = (0,0,0)
+
+        # store cursor transforms
+        bpy.context.scene.cursor.location = orig_cursor_loc
+        bpy.context.scene.cursor.rotation_euler = orig_cursor_rot
         
         # select objects again    
         for sel_obj in selected_obj:
